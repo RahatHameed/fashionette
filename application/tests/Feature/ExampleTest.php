@@ -15,7 +15,6 @@ class ExampleTest extends TestCase
     public function test_example()
     {
         $response = $this->get('/?q=MovieTitle');
-
         $response->assertStatus(200);
     }
 }
