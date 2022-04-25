@@ -16,4 +16,10 @@ interface ServiceInterface
      * @return string
      */
     public function filterMovieTitle(array $movies,string $query): string;
+
+    /**
+     * @param string $key
+     * @return bool
+     */
+    public function isCached(string $key): bool;
 }

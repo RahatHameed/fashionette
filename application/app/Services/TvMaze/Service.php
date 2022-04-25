@@ -32,9 +32,15 @@ class Service implements ServiceInterface
         $response = [];
         $query = urldecode($query);
 
-        $movies = $this->tvMazeApiClient->get(env('TVMAZE_URL').self::TVMAZE_SEARCH_URL,$query);
-        $filteredResponse = $this->filterMovieTitle($movies,$query);
-
+        if ($this->isCached($query)) {
+            $filteredResponse = Cache::get(strtolower($query));
+            $response['cached']=true;
+        }else{
+            $movies = $this->tvMazeApiClient->get(env('TVMAZE_URL').self::TVMAZE_SEARCH_URL,$query);
+            $filteredResponse = $this->filterMovieTitle($movies,$query);
+            Cache::put(strtolower($query), $filteredResponse);
+            $response['cached']=false;
+        }
         $response['message'] = sprintf("The searched tv show %s.",$query);
         $response['data'] = $filteredResponse;
         return $response;
@@ -57,6 +63,15 @@ class Service implements ServiceInterface
         });
 
         return $moviesCollection;
+    }
+
+    /**
+     * @param string $key
+     * @return bool
+     */
+    public function isCached(string $key): bool
+    {
+        return Cache::has(strtolower($key));
     }
 
 }
